@@ -50,3 +50,11 @@ Resources:
       ImageId: ami-08d8ac128e0a1b91c
       InstanceType: t2.micro
       SubnetId: !Ref PrivateSubnet
+
+  Topic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint: example@arroba.com
+          Protocol: email
+      TopicName: Topico
