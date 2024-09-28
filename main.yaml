@@ -58,3 +58,10 @@ Resources:
         - Endpoint: example@arroba.com
           Protocol: email
       TopicName: Topico
+  
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: Private
+      BucketName: !Sub ${AWS::StackName}-bucket-${AWS::AccountId}
+  
