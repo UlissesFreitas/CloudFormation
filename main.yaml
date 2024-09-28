@@ -1,54 +1,45 @@
----
-  Resources:
-    MyVPC:
-      Type: AWS::EC2::VPC
-      Properties:
-        CidrBlock: 192.168.0.0/16
-        EnableDnsSupport: 'true'
-        EnableDnsHostname: 'true'
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 192.168.0.0/16
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
 
-    PublicSubnetA:
-      Type: AWS::EC2::Subnet
-      Properties:
-        VpcId: !Ref MyVPC
-        CidrBlock: 192.168.1.0/24
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 192.168.1.0/24
 
-    PublicSubnetB:
-      Type: AWS::EC2::Subnet
-      Properties:
-        VpcId: !Ref MyVPC
-        CidrBlock: 192.168.2.0/24
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 192.168.2.0/24
 
-    PrivateSubnetA:
-        Type: AWS::EC2::Subnet
-        Properties:
-          VpcId: !Ref MyVPC
-          CidrBlock: 192.168.3.0/24
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
 
-    IGW:
-      Type: AWS::EC2::InternetGateway
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
 
-    AttachIGW:
-      Type: AWS::EC2::VPCGatewayAttachment
-      Properties:
-        VpcId: !Ref MyVPC
-        InternetGatewayId: !Red IGW
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
 
-    RT:
-      Type: AWS::EC2::RouteTable
-      Properties:
-        VpcId: !Ref MyVPC
+  Route:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGateway
+    Properties:
+      RouteTableId: !Ref RouteTable
 
-    RTtoIGW:
-      Type: AWS::EC2:Route
-      DependsOn: IGW
-      Properties:
-        DestinationCidrBlock: 0.0.0.0/0
-        GatewayId: !Ref IGW
-        RouteTableId: !Ref RT
-
-    RTAssoc:
-      Type: AWS::EC2::SubnetRouteTableAssociation
-      Properties:
-        RouteTableId: !Ref RT
-        SubnetId: !Ref PublicSubnetA
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref PublicSubnet
