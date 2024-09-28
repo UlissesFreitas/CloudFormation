@@ -65,3 +65,14 @@ Resources:
       AccessControl: Private
       BucketName: !Sub ${AWS::StackName}-bucket-${AWS::AccountId}
   
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Permit SSH access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
+      
