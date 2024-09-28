@@ -64,7 +64,16 @@ Resources:
     Properties:
       AccessControl: Private
       BucketName: !Sub ${AWS::StackName}-bucket-${AWS::AccountId}
-  
+      LifecycleConfiguration:
+        Rules:
+          - Id: Glacier
+            Prefix: relatorio
+            Status: Enable
+            ExpirationInDays: 365
+            Transitions:
+              - TransitionsInDays: 1
+                StorageClass: GLACIER
+
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
