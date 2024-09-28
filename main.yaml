@@ -1,0 +1,54 @@
+---
+  Resources:
+    MyVPC:
+      Type: AWS::EC2::VPC
+      Properties:
+        CidrBlock: 192.168.0.0/16
+        EnableDnsSupport: 'true'
+        EnableDnsHostname: 'true'
+
+    PublicSubnetA:
+      Type: AWS::EC2::Subnet
+      Properties:
+        VpcId: !Ref MyVPC
+        CidrBlock: 192.168.1.0/24
+
+    PublicSubnetB:
+      Type: AWS::EC2::Subnet
+      Properties:
+        VpcId: !Ref MyVPC
+        CidrBlock: 192.168.2.0/24
+
+    PrivateSubnetA:
+        Type: AWS::EC2::Subnet
+        Properties:
+          VpcId: !Ref MyVPC
+          CidrBlock: 192.168.3.0/24
+
+    IGW:
+      Type: AWS::EC2::InternetGateway
+
+    AttachIGW:
+      Type: AWS::EC2::VPCGatewayAttachment
+      Properties:
+        VpcId: !Ref MyVPC
+        InternetGatewayId: !Red IGW
+
+    RT:
+      Type: AWS::EC2::RouteTable
+      Properties:
+        VpcId: !Ref MyVPC
+
+    RTtoIGW:
+      Type: AWS::EC2:Route
+      DependsOn: IGW
+      Properties:
+        DestinationCidrBlock: 0.0.0.0/0
+        GatewayId: !Ref IGW
+        RouteTableId: !Ref RT
+
+    RTAssoc:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: !Ref RT
+        SubnetId: !Ref PublicSubnetA
