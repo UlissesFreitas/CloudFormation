@@ -160,14 +160,15 @@ Resources:
         FromPort: 3306
         ToPort: 3306
         CidrIp: 0.0.0.0/0
-        
+
   InstanceWebSRV:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-08d8ac128e0a1b91c
       InstanceType: t2.micro
       SubnetId: !Ref PublicSubnet
-      SecurityGroupIds: !Ref SecurityGroupWebSRV
+      SecurityGroups: 
+        - !Ref SecurityGroupWebSRV
 
   InstanceBastionHost:
     Type: AWS::EC2::Instance
@@ -175,6 +176,14 @@ Resources:
       ImageId: ami-08d8ac128e0a1b91c
       InstanceType: t2.micro
       SubnetId: !Ref PublicSubnet
-      SecurityGroupIds: !Ref SecurityGroupBastionHost
+      SecurityGroups: 
+        - !Ref SecurityGroupBastionHost
 
-
+  InstanceAppSRV:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-08d8ac128e0a1b91c
+      InstanceType: t2.micro
+      SubnetId: !Ref PrivateSubnet1
+      SecurityGroups: 
+        - !Ref SecurityGroupAppSRV
