@@ -113,6 +113,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "Permit SSH HTTP HTTPS"
+      VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 80
@@ -131,6 +132,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "Permit SSH HTTP HTTPS"
+      VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 80
@@ -149,20 +151,11 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "Permit SSH access"
+      VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
-        CidrIp: 0.0.0.0/0
-
-  SecurityGroupDataBase:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: "Permit Data Base access"
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 3306
-        ToPort: 3306
         CidrIp: 0.0.0.0/0
         
   InstanceWebSRV:
@@ -171,7 +164,8 @@ Resources:
       ImageId: ami-08d8ac128e0a1b91c
       InstanceType: t2.micro
       SubnetId: !Ref PublicSubnet
-      SecurityGroupIds: !Ref SecurityGroupWebSRV
+      SecurityGroupIds: 
+        - !Ref SecurityGroupWebSRV
 
   InstanceBastionHost:
     Type: AWS::EC2::Instance
