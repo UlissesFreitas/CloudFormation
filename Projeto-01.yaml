@@ -187,3 +187,5 @@ Resources:
       SubnetId: !Ref PrivateSubnet1
       SecurityGroups: 
         - !Ref SecurityGroupAppSRV
+
+      
