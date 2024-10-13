@@ -60,7 +60,7 @@ Resources:
   NATGateway:
     Type: AWS::EC2::NatGateway
     Properties:
-      AllocationId: !GetAtt NatGatewayEIP.AllocationId
+      AllocationId: !GetAtt NATGatewayEIP.AllocationId
       SubnetId: !Ref PublicSubnet
 
   PublicRouteTable:
@@ -85,17 +85,13 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
-      Tags:
-        - Key: Name
-          Value: Public Route
  
   PrivateRoute:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref RouteTable
-      Tags:
-        - Key: Name
-          Value: Private Route
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref NATGateway
 
   PublicSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -106,14 +102,13 @@ Resources:
   PrivateSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PrivateSubnet
-      RouteTableId: !Ref 
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
 
   SecurityGroupWebSRV:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "Permit SSH HTTP HTTPS"
-      VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 80
@@ -132,7 +127,6 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "Permit SSH HTTP HTTPS"
-      VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 80
@@ -151,20 +145,29 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "Permit SSH access"
-      VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: 0.0.0.0/0
-        
+
+  SecurityGroupDataBase:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Permit Data Base access"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 3306
+        ToPort: 3306
+        CidrIp: 0.0.0.0/0
+
   InstanceWebSRV:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-08d8ac128e0a1b91c
       InstanceType: t2.micro
       SubnetId: !Ref PublicSubnet
-      SecurityGroupIds: 
+      SecurityGroups: 
         - !Ref SecurityGroupWebSRV
 
   InstanceBastionHost:
@@ -173,7 +176,8 @@ Resources:
       ImageId: ami-08d8ac128e0a1b91c
       InstanceType: t2.micro
       SubnetId: !Ref PublicSubnet
-      SecurityGroupIds: !Ref SecurityGroupBastionHost
+      SecurityGroups: 
+        - !Ref SecurityGroupBastionHost
 
   InstanceAppSRV:
     Type: AWS::EC2::Instance
@@ -181,5 +185,5 @@ Resources:
       ImageId: ami-08d8ac128e0a1b91c
       InstanceType: t2.micro
       SubnetId: !Ref PrivateSubnet1
-      SecurityGroupIds: !Ref SecurityGroupAppSRV
-
+      SecurityGroups: 
+        - !Ref SecurityGroupAppSRV
